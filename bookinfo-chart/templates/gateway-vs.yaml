@@ -1,44 +1,41 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
-  name: {{ .name }}
+  name: {{ .Values.gateways.name }}
 spec:
   selector:
-    {{- range $key, $value := .selector }}
-    {{ $key }}: "{{ $value }}"
-    {{- end }}
+    istio: ingressgateway
   servers:
     - port:
         number: {{ .Values.gateways.port.number }}
         name: {{ .Values.gateways.port.name }}
         protocol: {{ .Values.gateways.port.protocol }}
       hosts:
-        - "{{ range $value := .hosts }}{{ $value }}{{ end }}"
-{{- end }}
-
+        - "*"
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: {{ .name }}
+  name: {{ .Values.virtualServices.name }}
 spec:
   hosts:
-    - "{{ range $value := .hosts }}{{ $value }}{{ end }}"
+    - "*"
   gateways:
-    - "{{ range $value := .gateways }}{{ $value }}{{ end }}"
+    - "{{ .Values.gateways.name }}"
   http:
-    {{- range .http }}
     - match:
-        {{- range .match }}
-        - uri:
-            {{- range $key, $value := . }}
-            {{ $key }}: "{{ $value }}"
-            {{- end }}
-        {{- end }}
+      - uri:
+          exact: /productpage
+      - uri:
+          prefix: /static
+      - uri:
+          exact: /login
+      - uri:
+          exact: /logout
+      - uri:
+          prefix: /api/v1/products
       route:
         - destination:
             host: {{ .Values.virtualServices.http.route.destination.host }}
             port:
               number: {{ .Values.virtualServices.http.route.destination.port.number }}
-    {{- end }}
-{{- end }}
