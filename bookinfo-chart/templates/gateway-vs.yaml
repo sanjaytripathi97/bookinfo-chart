@@ -1,0 +1,46 @@
+{{- range .Values.gateways }}
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: {{ .name }}
+spec:
+  selector:
+    {{- range $key, $value := .selector }}
+    {{ $key }}: "{{ $value }}"
+    {{- end }}
+  servers:
+    - port:
+        number: {{ .port.number }}
+        name: {{ .port.name }}
+        protocol: {{ .port.protocol }}
+      hosts:
+        - "{{ range $value := .hosts }}{{ $value }}{{ end }}"
+{{- end }}
+
+{{- range .Values.virtualServices }}
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ .name }}
+spec:
+  hosts:
+    - "{{ range $value := .hosts }}{{ $value }}{{ end }}"
+  gateways:
+    - "{{ range $value := .gateways }}{{ $value }}{{ end }}"
+  http:
+    {{- range .http }}
+    - match:
+        {{- range .match }}
+        - uri:
+            {{- range $key, $value := . }}
+            {{ $key }}: "{{ $value }}"
+            {{- end }}
+        {{- end }}
+      route:
+        - destination:
+            host: {{ .route.destination.host }}
+            port:
+              number: {{ .route.destination.port.number }}
+    {{- end }}
+{{- end }}

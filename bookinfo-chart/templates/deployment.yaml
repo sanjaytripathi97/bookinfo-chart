@@ -1,0 +1,331 @@
+##################################################################################################
+# This file defines the services, service accounts, and deployments for the Bookinfo sample.
+#
+# To apply all 4 Bookinfo services, their corresponding service accounts, and deployments:
+#
+#   kubectl apply -f samples/bookinfo/platform/kube/bookinfo.yaml
+#
+# Alternatively, you can deploy any resource separately:
+#
+#   kubectl apply -f samples/bookinfo/platform/kube/bookinfo.yaml -l service=reviews # reviews Service
+#   kubectl apply -f samples/bookinfo/platform/kube/bookinfo.yaml -l account=reviews # reviews ServiceAccount
+#   kubectl apply -f samples/bookinfo/platform/kube/bookinfo.yaml -l app=reviews,version=v3 # reviews-v3 Deployment
+##################################################################################################
+
+##################################################################################################
+# Details service
+##################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: details
+  labels:
+    app: details
+    service: details
+spec:
+  ports:
+  - port: {{ .Values.services.details.ports.http }}
+    name: http
+  selector:
+    app: details
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.serviceAccounts.details }}
+  labels:
+    account: details
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: details-v1
+  labels:
+    app: details
+    version: v1
+spec:
+  replicas: {{ .Values.deployments.details.replicas }}
+  selector:
+    matchLabels:
+      app: details
+      version: v1
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: details
+        version: v1
+    spec:
+      serviceAccountName: {{ .Values.serviceAccounts.details }}
+      containers:
+      - name: details
+        image: {{ .Values.deployments.details.image }}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: {{ .Values.services.details.ports.http }}
+---
+##################################################################################################
+# Ratings service
+##################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: ratings
+  labels:
+    app: ratings
+    service: ratings
+spec:
+  ports:
+  - port: {{ .Values.services.ratings.ports.http }}
+    name: http
+  selector:
+    app: ratings
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.serviceAccounts.ratings }}
+  labels:
+    account: ratings
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ratings-v1
+  labels:
+    app: ratings
+    version: v1
+spec:
+  replicas: {{ .Values.deployments.ratings.replicas }}
+  selector:
+    matchLabels:
+      app: ratings
+      version: v1
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: ratings
+        version: v1
+    spec:
+      serviceAccountName: {{ .Values.serviceAccounts.ratings }}
+      containers:
+      - name: ratings
+        image: {{ .Values.deployments.ratings.image }}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: {{ .Values.services.ratings.ports.http }}
+---
+##################################################################################################
+# Reviews service
+##################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: reviews
+  labels:
+    app: reviews
+    service: reviews
+spec:
+  ports:
+  - port: {{ .Values.services.reviews.ports.http }}
+    name: http
+  selector:
+    app: reviews
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.serviceAccounts.reviews }}
+  labels:
+    account: reviews
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reviews-v1
+  labels:
+    app: reviews
+    version: v1
+spec:
+  replicas: {{ .Values.deployments.reviews.v1.replicas }}
+  selector:
+    matchLabels:
+      app: reviews
+      version: v1
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: reviews
+        version: v1
+    spec:
+      serviceAccountName: {{ .Values.serviceAccounts.reviews }}
+      containers:
+      - name: reviews
+        image: {{ .Values.deployments.reviews.v1.image }}
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: LOG_DIR
+          value: "/tmp/logs"
+        ports:
+        - containerPort: {{ .Values.services.reviews.ports.http }}
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        - name: wlp-output
+          mountPath: /opt/ibm/wlp/output
+      volumes:
+      - name: wlp-output
+        emptyDir: {}
+      - name: tmp
+        emptyDir: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reviews-v2
+  labels:
+    app: reviews
+    version: v2
+spec:
+  replicas: {{ .Values.deployments.reviews.v2.replicas }}
+  selector:
+    matchLabels:
+      app: reviews
+      version: v2
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: reviews
+        version: v2
+    spec:
+      serviceAccountName: {{ .Values.serviceAccounts.reviews }}
+      containers:
+      - name: reviews
+        image: {{ .Values.deployments.reviews.v2.image }}
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: LOG_DIR
+          value: "/tmp/logs"
+        ports:
+        - containerPort: {{ .Values.services.reviews.ports.http }}
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        - name: wlp-output
+          mountPath: /opt/ibm/wlp/output
+      volumes:
+      - name: wlp-output
+        emptyDir: {}
+      - name: tmp
+        emptyDir: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reviews-v3
+  labels:
+    app: reviews
+    version: v3
+spec:
+  replicas: {{ .Values.deployments.reviews.v3.replicas }}
+  selector:
+    matchLabels:
+      app: reviews
+      version: v3
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: reviews
+        version: v3
+    spec:
+      serviceAccountName: {{ .Values.serviceAccounts.reviews }}
+      containers:
+      - name: reviews
+        image: {{ .Values.deployments.reviews.v3.image }}
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: LOG_DIR
+          value: "/tmp/logs"
+        ports:
+        - containerPort: {{ .Values.services.reviews.ports.http }}
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        - name: wlp-output
+          mountPath: /opt/ibm/wlp/output
+      volumes:
+      - name: wlp-output
+        emptyDir: {}
+      - name: tmp
+        emptyDir: {}
+---
+##################################################################################################
+# Productpage services
+##################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: productpage
+  labels:
+    app: productpage
+    service: productpage
+spec:
+  ports:
+  - port: {{ .Values.services.productpage.ports.http }}
+    name: http
+  selector:
+    app: productpage
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.serviceAccounts.productpage }}
+  labels:
+    account: productpage
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: productpage-v1
+  labels:
+    app: productpage
+    version: v1
+spec:
+  replicas: {{ .Values.deployments.productpage.replicas }}
+  selector:
+    matchLabels:
+      app: productpage
+      version: v1
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9080"
+        prometheus.io/path: "/metrics"
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: productpage
+        version: v1
+    spec:
+      serviceAccountName: {{ .Values.serviceAccounts.productpage }}
+      containers:
+      - name: productpage
+        image: {{ .Values.deployments.productpage.image }}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: {{ .Values.services.productpage.ports.http }}
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+      volumes:
+      - name: tmp
+        emptyDir: {}

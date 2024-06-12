@@ -1,0 +1,19 @@
+##################################################################################################
+# Destination Rules
+##################################################################################################
+{{- range .Values.destinationRules }}
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: {{ .metadata.name }}
+spec:
+  host: {{ .spec.host }}
+  subsets:
+  {{- range .spec.subsets }}
+  - name: {{ .name }}
+    labels:
+      {{- range $key, $value := .labels }}
+      {{ $key }}: "{{ $value }}"
+      {{- end }}
+  {{- end }}
+{{- end }}
