@@ -45,37 +45,23 @@ serviceAccounts:
   reviews: bookinfo-reviews
   productpage: bookinfo-productpage
 
+
 gateways:
-  - name: bookinfo-gateway
+    name: bookinfo-gateway
     selector:
       istio: ingressgateway
     port:
       number: 80
       name: http
       protocol: HTTP
-    hosts:
-      - "*"
 
 virtualServices:
-  - name: bookinfo
-    hosts:
-      - "*"
+    name: bookinfo
     gateways:
-      - bookinfo-gateway
+       bookinfo-gateway
     http:
-      - match:
-          - uri:
-              exact: /productpage
-          - uri:
-              prefix: /static
-          - uri:
-              exact: /login
-          - uri:
-              exact: /logout
-          - uri:
-              prefix: /api/v1/products
-        route:
-          - destination:
-              host: productpage
-              port:
-                number: 9080
+      route:
+           destination:
+             host: productpage
+             port:
+               number: 9080
