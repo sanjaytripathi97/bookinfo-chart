@@ -10,9 +10,9 @@ spec:
     {{- end }}
   servers:
     - port:
-        number: {{ .port.number }}
-        name: {{ .port.name }}
-        protocol: {{ .port.protocol }}
+        number: {{ .Values.gateways.port.number }}
+        name: {{ .Values.gateways.port.name }}
+        protocol: {{ .Values.gateways.port.protocol }}
       hosts:
         - "{{ range $value := .hosts }}{{ $value }}{{ end }}"
 {{- end }}
@@ -39,8 +39,8 @@ spec:
         {{- end }}
       route:
         - destination:
-            host: {{ .route.destination.host }}
+            host: {{ .Values.virtualServices.http.route.destination.host }}
             port:
-              number: {{ .route.destination.port.number }}
+              number: {{ .Values.virtualServices.http.route.destination.port.number }}
     {{- end }}
 {{- end }}
