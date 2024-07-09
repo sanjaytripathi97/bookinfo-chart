@@ -1,5 +1,5 @@
-image: gcr.io/kuar-demo/kuard-amd64:blue
-name: app2
+image: gcr.io/kuar-demo/kuard-amd64:green
+name: blue-v1
 version: blue 
 namespace: multiple-value-test
 sidecar: true
