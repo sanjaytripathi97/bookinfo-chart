@@ -1,0 +1,21 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./templates/deployment.yaml
+
+patches:
+  - path: values-v1.yaml
+    target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: app1
+      namespace: multiple-value-test
+
+  - path: values-v2.yaml
+    target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: app2
+      namespace: multiple-value-test

@@ -19,3 +19,67 @@ spec:
     automated:
       prune: true
       selfHeal: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kuard-app
+  namespace: openshift-gitops
+spec:
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: multiple-value-test
+  project: default
+  source:
+    repoURL: https://github.com/sanjaytripathi97/bookinfo-chart
+    path: kuard-chart
+    targetRevision: main
+  helm:
+    valueFiles:
+      - values-v1.yaml
+      - values-v2.yaml
+    values:
+      - name: image
+        value: gcr.io/kuar-demo/kuard-amd64:green
+        path: deployment.yaml
+        create: true
+      - name: name
+        value: app1
+        path: deployment.yaml
+        create: true
+      - name: version
+        value: green
+        path: deployment.yaml
+        create: true
+      - name: namespace
+        value: multiple-value-test
+        path: deployment.yaml
+        create: true
+      - name: sidecar
+        value: "true"
+        path: deployment.yaml
+        create: true
+      - name: image
+        value: gcr.io/kuar-demo/kuard-amd64:blue
+        path: deployment.yaml
+        create: true
+      - name: name
+        value: app2
+        path: deployment.yaml
+        create: true
+      - name: version
+        value: blue
+        path: deployment.yaml
+        create: true
+      - name: namespace
+        value: multiple-value-test
+        path: deployment.yaml
+        create: true
+      - name: sidecar
+        value: "true"
+        path: deployment.yaml
+        create: true
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
