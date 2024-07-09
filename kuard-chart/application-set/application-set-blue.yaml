@@ -20,6 +20,9 @@ spec:
         server: https://kubernetes.default.svc
       project: default
       source:
+        helm:
+          valueFiles:
+            - values.yaml
         path: kuard-chart/blue/{{ cluster }}/chart
         repoURL: https://github.com/sanjaytripathi97/bookinfo-chart.git
         targetRevision: main
