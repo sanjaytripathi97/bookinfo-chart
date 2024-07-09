@@ -11,10 +11,6 @@ spec:
         url: https://kubernetes.default.svc
       - cluster: green-v2
         url: https://kubernetes.default.svc
-      - cluster: blue-v1
-        url: https://kubernetes.default.svc
-      - cluster: blue-v2
-        url: https://kubernetes.default.svc
   template:
     metadata:
       name: application-instance-{{cluster}}
